@@ -1,0 +1,382 @@
+# Пример работы МЛВ (CLIPS)
+
+## Команда запуска
+
+```bash
+printf "(clear)\n(load \"./network_security_assessment.clp\")\n(reset)\n(watch rules)\n(run)\n(facts)\n(exit)\n" | clips
+```
+
+## Вывод МЛВ (как есть)
+
+> Ниже приведен сырой вывод CLIPS без изменений.
+
+```text
+         CLIPS (6.4.2 1/14/25)
+CLIPS> CLIPS> %%%%%%%%%%%%$**************************************************
+TRUE
+CLIPS> CLIPS> CLIPS> FIRE    1 r1-collect-raw: f-1,f-14
+FIRE    2 r1-collect-raw: f-1,f-13
+FIRE    3 r1-collect-raw: f-1,f-12
+FIRE    4 r1-collect-raw: f-1,f-11
+FIRE    5 r1-collect-raw: f-1,f-10
+FIRE    6 r1-collect-raw: f-1,f-9
+FIRE    7 r1-collect-raw: f-1,f-8
+FIRE    8 r2-finish-collection: f-1,f-21
+FIRE    9 r3-verify-nodes: f-23,f-7
+FIRE   10 r4-start-normalization: f-25,f-24
+FIRE   11 r5-detect-protocols: f-27,f-21
+FIRE   12 r6-detect-high-rate: f-29,f-21
+FIRE   13 r7-ddos-indicator: f-31,f-30,f-21
+FIRE   14 r8-detect-failed-logins: f-33,f-19
+FIRE   15 r9-bruteforce-indicator: f-35,f-34
+FIRE   16 r10-detect-scan-symptom: f-37,f-18
+FIRE   17 r11-portscan-indicator: f-39,f-38
+FIRE   18 r12-detect-dns-tunnel: f-41,f-16
+FIRE   19 r13-dns-tunnel-indicator: f-43,f-42
+FIRE   20 r14-detect-sql-injection: f-45,f-15
+FIRE   21 r15-app-attack-indicator: f-47,f-46
+FIRE   22 r16-aggregate-indicators: f-49,f-48
+FIRE   23 r17-critical-severity: f-51,f-50,f-5
+FIRE   24 r19-assess-ddos: f-53,f-32
+FIRE   25 r20-assess-bruteforce: f-55,f-36
+FIRE   26 r21-assess-portscan: f-57,f-40
+FIRE   27 r22-assess-dns-tunnel: f-59,f-44
+FIRE   28 r23-compute-risk: f-61,f-52
+FIRE   29 r24-map-risk: f-63,f-62
+FIRE   30 r25-recommend-block-ddos: f-65,f-54
+FIRE   31 r26-recommend-lockout-ssh: f-67,f-56
+FIRE   32 r27-recommend-monitor-scan: f-69,f-58
+FIRE   33 r28-recommend-block-dns: f-71,f-60
+FIRE   34 r29-prepare-http: f-73
+FIRE   35 r31-deny-http: f-75,f-32,*
+FIRE   36 r32-prepare-ssh: f-78
+FIRE   37 r34-deny-ssh: f-80,f-36,*
+FIRE   38 r35-prepare-dns: f-83
+FIRE   39 r37-deny-dns: f-85,f-44,*
+FIRE   40 r38-consolidate-verdicts: f-88,f-86
+FIRE   41 r39-prioritize-blocking: f-90,f-86
+FIRE   42 r41-generate-recommendations: f-92
+FIRE   43 r42-escalate-soc: f-94,f-91
+FIRE   44 r43-final-critical: f-96,f-6,f-91
+FIRE   45 r44-log-decision: f-98
+FIRE   46 r45-close-session: f-100
+FIRE   47 r46-cleanup: f-102
+FIRE   48 r47-prepare-summary: f-104
+FIRE   49 r48-report-ready: f-106
+FIRE   50 r49-mark-complete: f-108
+FIRE   51 r50-final-state: f-110
+CLIPS> f-2     (policy (service http) (value allow))
+f-3     (policy (service ssh) (value allow))
+f-4     (policy (service dns) (value allow))
+f-5     (network-node (id web1) (role web) (os linux) (criticality high) (zone dmz))
+f-6     (network-node (id db1) (role db) (os linux) (criticality high) (zone internal))
+f-7     (network-node (id dns1) (role dns) (os linux) (criticality medium) (zone dmz))
+f-8     (traffic-event (src 198.51.100.10) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /") (time-window short))
+f-9     (traffic-event (src 198.51.100.11) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /index") (time-window short))
+f-10    (traffic-event (src 203.0.113.5) (dst web1) (protocol tcp) (port 22) (rate medium) (failed-logins 20) (payload "ssh") (time-window short))
+f-11    (traffic-event (src 203.0.113.5) (dst web1) (protocol tcp) (port 23) (rate medium) (failed-logins 0) (payload "SYN") (time-window short))
+f-12    (traffic-event (src 203.0.113.5) (dst web1) (protocol tcp) (port 443) (rate medium) (failed-logins 0) (payload "SYN") (time-window short))
+f-13    (traffic-event (src 192.0.2.77) (dst dns1) (protocol udp) (port 53) (rate medium) (failed-logins 0) (payload "TUNNELDATA") (time-window short))
+f-14    (traffic-event (src 198.51.100.22) (dst web1) (protocol tcp) (port 80) (rate low) (failed-logins 0) (payload "UNION SELECT") (time-window long))
+f-15    (raw-observation (src 198.51.100.22) (dst web1) (protocol tcp) (port 80) (rate low) (failed-logins 0) (payload "UNION SELECT"))
+f-16    (raw-observation (src 192.0.2.77) (dst dns1) (protocol udp) (port 53) (rate medium) (failed-logins 0) (payload "TUNNELDATA"))
+f-17    (raw-observation (src 203.0.113.5) (dst web1) (protocol tcp) (port 443) (rate medium) (failed-logins 0) (payload "SYN"))
+f-18    (raw-observation (src 203.0.113.5) (dst web1) (protocol tcp) (port 23) (rate medium) (failed-logins 0) (payload "SYN"))
+f-19    (raw-observation (src 203.0.113.5) (dst web1) (protocol tcp) (port 22) (rate medium) (failed-logins 20) (payload "ssh"))
+f-20    (raw-observation (src 198.51.100.11) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /index"))
+f-21    (raw-observation (src 198.51.100.10) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /"))
+f-22    (context (key raw-collected) (value yes))
+f-24    (context (key nodes-verified) (value yes))
+f-26    (context (key normalization) (value started))
+f-28    (context (key protocols-seen) (value yes))
+f-30    (threat-indicator (type high-rate) (src 198.51.100.10) (dst web1) (severity medium) (evidence "high-rate"))
+f-32    (threat-indicator (type ddos-attack) (src 198.51.100.10) (dst web1) (severity high) (evidence "many-requests"))
+f-34    (threat-indicator (type brute-force-symptom) (src 203.0.113.5) (dst web1) (severity medium) (evidence "failed-logins"))
+f-36    (threat-indicator (type brute-force-attack) (src 203.0.113.5) (dst web1) (severity high) (evidence "ssh-bruteforce"))
+f-38    (threat-indicator (type scan-symptom) (src 203.0.113.5) (dst web1) (severity medium) (evidence "syn-probes"))
+f-40    (threat-indicator (type port-scan-attack) (src 203.0.113.5) (dst web1) (severity medium) (evidence "port-scan"))
+f-42    (threat-indicator (type dns-tunnel-symptom) (src 192.0.2.77) (dst dns1) (severity medium) (evidence "dns-tunnel"))
+f-44    (threat-indicator (type dns-tunnel-attack) (src 192.0.2.77) (dst dns1) (severity high) (evidence "dns-exfil"))
+f-46    (threat-indicator (type app-attack-symptom) (src 198.51.100.22) (dst web1) (severity medium) (evidence "sql-injection"))
+f-48    (threat-indicator (type app-attack) (src 198.51.100.22) (dst web1) (severity high) (evidence "web-attack"))
+f-50    (aggregate (type indicators-present) (src 198.51.100.22) (dst web1) (count 1))
+f-52    (context (key severity) (value high))
+f-54    (attack-assessment (type ddos) (src 198.51.100.10) (dst web1) (level high))
+f-56    (attack-assessment (type brute-force) (src 203.0.113.5) (dst web1) (level high))
+f-58    (attack-assessment (type port-scan) (src 203.0.113.5) (dst web1) (level medium))
+f-60    (attack-assessment (type dns-tunnel) (src 192.0.2.77) (dst dns1) (level high))
+f-62    (context (key risk) (value high))
+f-64    (context (key decision-basis) (value high))
+f-66    (candidate-action (service http) (action block) (reason "ddos"))
+f-68    (candidate-action (service ssh) (action lockout) (reason "bruteforce"))
+f-70    (candidate-action (service net) (action monitor) (reason "port-scan"))
+f-72    (candidate-action (service dns) (action block) (reason "dns-tunnel"))
+f-74    (context (key decision-http) (value ready))
+f-76    (security-verdict (target http) (action block) (level high) (reason "ddos"))
+f-77    (decision-flag (service http))
+f-79    (context (key decision-ssh) (value ready))
+f-81    (security-verdict (target ssh) (action block) (level high) (reason "bruteforce"))
+f-82    (decision-flag (service ssh))
+f-84    (context (key decision-dns) (value ready))
+f-86    (security-verdict (target dns) (action block) (level high) (reason "dns-tunnel"))
+f-87    (decision-flag (service dns))
+f-89    (context (key verdicts) (value consolidated))
+f-91    (context (key posture) (value high))
+f-93    (security-verdict (target network) (action monitor) (level medium) (reason "continuous-monitoring"))
+f-95    (security-verdict (target soc) (action escalate) (level high) (reason "high-risk"))
+f-97    (security-verdict (target db1) (action isolate) (level high) (reason "critical-asset"))
+f-99    (context (key log) (value written))
+f-101   (context (key session) (value closed))
+f-103   (context (key cleanup) (value done))
+f-105   (context (key summary) (value ready))
+f-107   (context (key report) (value ready))
+f-109   (context (key inference) (value complete))
+f-111   (context (key system-state) (value stable))
+f-112   (analysis-stage (n 47))
+For a total of 68 facts.
+CLIPS> 
+```
+
+## Пояснения к выводу (это мои комментарии, не часть результата работы МЛВ)
+
+- `CLIPS (6.4.2 1/14/25)` — версия интерпретатора, на котором выполнен запуск.
+- `TRUE` после `(load ...)` — файл базы знаний успешно загружен.
+- Строки `FIRE ...` — срабатывания правил в порядке выполнения (трассировка включена через `(watch rules)`).
+- Блок `f-... (...)` после команды `(facts)` — итоговые факты, полученные после завершения вывода.
+- `For a total of 68 facts.` — итоговое количество фактов в рабочей памяти CLIPS.
+- `(context (key system-state) (value stable))` в списке фактов — система завершила вывод в стабильном состоянии.
+
+## Разбор групп фактов из `(facts)` (это мои комментарии, не часть результата работы МЛВ)
+
+### 1) Политики и описание узлов
+
+Категория: `входные данные`.
+
+Общий комментарий: эта группа описывает базовую конфигурацию сети и исходные разрешения сервисов.
+
+- `policy`: базовые политики по сервисам (`http`, `ssh`, `dns`).
+- `network-node`: инвентаризация узлов и их критичность/зона.
+
+Таблица примеров:
+
+| Факт | Что означает |
+|---|---|
+| `(policy (service http) (value allow))` | По HTTP исходная политика "разрешить". |
+| `(network-node (id db1) (criticality high) (zone internal) ...)` | Узел `db1` критичный и во внутренней зоне, поэтому решения по нему строже. |
+
+Факты группы (дословно из вывода CLIPS):
+
+```text
+f-2     (policy (service http) (value allow))
+f-3     (policy (service ssh) (value allow))
+f-4     (policy (service dns) (value allow))
+f-5     (network-node (id web1) (role web) (os linux) (criticality high) (zone dmz))
+f-6     (network-node (id db1) (role db) (os linux) (criticality high) (zone internal))
+f-7     (network-node (id dns1) (role dns) (os linux) (criticality medium) (zone dmz))
+```
+
+### 2) Наблюдаемый трафик и сырые наблюдения
+
+Категория: `входные данные` + начало `промежуточных фактов`.
+
+Общий комментарий: сначала заданы события трафика (`traffic-event`), затем они приводятся к унифицированной форме (`raw-observation`) для дальнейшего вывода.
+
+- `traffic-event`: исходные события с атрибутами `src/dst/protocol/port/rate/payload`.
+- `raw-observation`: нормализованные наблюдения, с которыми работают правила обнаружения.
+
+Таблица примеров:
+
+| Факт | Что означает |
+|---|---|
+| `(traffic-event ... (rate high) ... (payload "GET /"))` | Высокоинтенсивный HTTP-трафик к `web1`. |
+| `(raw-observation ... (payload "UNION SELECT"))` | Зафиксирован признак SQL-инъекции в полезной нагрузке. |
+
+Факты группы (дословно из вывода CLIPS):
+
+```text
+f-8     (traffic-event (src 198.51.100.10) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /") (time-window short))
+f-9     (traffic-event (src 198.51.100.11) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /index") (time-window short))
+f-10    (traffic-event (src 203.0.113.5) (dst web1) (protocol tcp) (port 22) (rate medium) (failed-logins 20) (payload "ssh") (time-window short))
+f-11    (traffic-event (src 203.0.113.5) (dst web1) (protocol tcp) (port 23) (rate medium) (failed-logins 0) (payload "SYN") (time-window short))
+f-12    (traffic-event (src 203.0.113.5) (dst web1) (protocol tcp) (port 443) (rate medium) (failed-logins 0) (payload "SYN") (time-window short))
+f-13    (traffic-event (src 192.0.2.77) (dst dns1) (protocol udp) (port 53) (rate medium) (failed-logins 0) (payload "TUNNELDATA") (time-window short))
+f-14    (traffic-event (src 198.51.100.22) (dst web1) (protocol tcp) (port 80) (rate low) (failed-logins 0) (payload "UNION SELECT") (time-window long))
+f-15    (raw-observation (src 198.51.100.22) (dst web1) (protocol tcp) (port 80) (rate low) (failed-logins 0) (payload "UNION SELECT"))
+f-16    (raw-observation (src 192.0.2.77) (dst dns1) (protocol udp) (port 53) (rate medium) (failed-logins 0) (payload "TUNNELDATA"))
+f-17    (raw-observation (src 203.0.113.5) (dst web1) (protocol tcp) (port 443) (rate medium) (failed-logins 0) (payload "SYN"))
+f-18    (raw-observation (src 203.0.113.5) (dst web1) (protocol tcp) (port 23) (rate medium) (failed-logins 0) (payload "SYN"))
+f-19    (raw-observation (src 203.0.113.5) (dst web1) (protocol tcp) (port 22) (rate medium) (failed-logins 20) (payload "ssh"))
+f-20    (raw-observation (src 198.51.100.11) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /index"))
+f-21    (raw-observation (src 198.51.100.10) (dst web1) (protocol tcp) (port 80) (rate high) (failed-logins 0) (payload "GET /"))
+```
+
+### 3) Индикаторы угроз и агрегаты
+
+Категория: `промежуточные факты`.
+
+Общий комментарий: эта группа отражает переход от симптомов к подтвержденным типам атак.
+
+- `threat-indicator`: признаки и подтверждения (`high-rate`, `ddos-attack`, `brute-force-attack`, `dns-tunnel-attack`, `app-attack`).
+- `aggregate`: агрегированная отметка о наличии индикаторов.
+
+Таблица примеров:
+
+| Факт | Что означает |
+|---|---|
+| `(threat-indicator (type ddos-attack) ... (severity high) ...)` | Зафиксирована подтвержденная DDoS-атака высокой серьезности. |
+| `(threat-indicator (type brute-force-attack) ... )` | Подтвержден брутфорс по SSH. |
+| `(aggregate (type indicators-present) ... (count 1))` | Система отметила наличие индикаторов на узле-назначении. |
+
+Факты группы (дословно из вывода CLIPS):
+
+```text
+f-30    (threat-indicator (type high-rate) (src 198.51.100.10) (dst web1) (severity medium) (evidence "high-rate"))
+f-32    (threat-indicator (type ddos-attack) (src 198.51.100.10) (dst web1) (severity high) (evidence "many-requests"))
+f-34    (threat-indicator (type brute-force-symptom) (src 203.0.113.5) (dst web1) (severity medium) (evidence "failed-logins"))
+f-36    (threat-indicator (type brute-force-attack) (src 203.0.113.5) (dst web1) (severity high) (evidence "ssh-bruteforce"))
+f-38    (threat-indicator (type scan-symptom) (src 203.0.113.5) (dst web1) (severity medium) (evidence "syn-probes"))
+f-40    (threat-indicator (type port-scan-attack) (src 203.0.113.5) (dst web1) (severity medium) (evidence "port-scan"))
+f-42    (threat-indicator (type dns-tunnel-symptom) (src 192.0.2.77) (dst dns1) (severity medium) (evidence "dns-tunnel"))
+f-44    (threat-indicator (type dns-tunnel-attack) (src 192.0.2.77) (dst dns1) (severity high) (evidence "dns-exfil"))
+f-46    (threat-indicator (type app-attack-symptom) (src 198.51.100.22) (dst web1) (severity medium) (evidence "sql-injection"))
+f-48    (threat-indicator (type app-attack) (src 198.51.100.22) (dst web1) (severity high) (evidence "web-attack"))
+f-50    (aggregate (type indicators-present) (src 198.51.100.22) (dst web1) (count 1))
+```
+
+### 4) Оценка атак и риска
+
+Категория: `промежуточные факты`.
+
+Общий комментарий: после выделения угроз система рассчитывает оценку атак и общий риск.
+
+- `attack-assessment`: оценка по классам атак (`ddos`, `brute-force`, `port-scan`, `dns-tunnel`).
+- `context (key severity/risk/decision-basis)`: промежуточные состояния принятия решения.
+
+Таблица примеров:
+
+| Факт | Что означает |
+|---|---|
+| `(attack-assessment (type ddos) ... (level high))` | Класс DDoS оценен как высокий риск. |
+| `(context (key risk) (value high))` | Суммарный риск для текущей ситуации оценен как высокий. |
+
+Факты группы (дословно из вывода CLIPS):
+
+```text
+f-52    (context (key severity) (value high))
+f-54    (attack-assessment (type ddos) (src 198.51.100.10) (dst web1) (level high))
+f-56    (attack-assessment (type brute-force) (src 203.0.113.5) (dst web1) (level high))
+f-58    (attack-assessment (type port-scan) (src 203.0.113.5) (dst web1) (level medium))
+f-60    (attack-assessment (type dns-tunnel) (src 192.0.2.77) (dst dns1) (level high))
+f-62    (context (key risk) (value high))
+f-64    (context (key decision-basis) (value high))
+```
+
+### 5) Кандидатные действия и итоговые вердикты
+
+Категория: `итоговый результат анализа сети`.
+
+Общий комментарий: система формирует меры реагирования и выпускает финальные решения по сервисам/объектам.
+
+- `candidate-action`: предварительные меры (`block`, `lockout`, `monitor`).
+- `security-verdict`: итоговые предписания (`http/ssh/dns block`, `soc escalate`, `db1 isolate`, `network monitor`).
+- `decision-flag`: служебные флаги, что решение по сервису уже принято.
+
+Таблица примеров:
+
+| Факт | Что означает |
+|---|---|
+| `(security-verdict (target http) (action block) ...)` | Итоговое решение: блокировать HTTP-трафик. |
+| `(security-verdict (target soc) (action escalate) ...)` | Нужна эскалация инцидента в SOC. |
+| `(security-verdict (target db1) (action isolate) ...)` | Критичный узел `db1` подлежит изоляции. |
+
+Факты группы (дословно из вывода CLIPS):
+
+```text
+f-66    (candidate-action (service http) (action block) (reason "ddos"))
+f-68    (candidate-action (service ssh) (action lockout) (reason "bruteforce"))
+f-70    (candidate-action (service net) (action monitor) (reason "port-scan"))
+f-72    (candidate-action (service dns) (action block) (reason "dns-tunnel"))
+f-76    (security-verdict (target http) (action block) (level high) (reason "ddos"))
+f-81    (security-verdict (target ssh) (action block) (level high) (reason "bruteforce"))
+f-86    (security-verdict (target dns) (action block) (level high) (reason "dns-tunnel"))
+f-93    (security-verdict (target network) (action monitor) (level medium) (reason "continuous-monitoring"))
+f-95    (security-verdict (target soc) (action escalate) (level high) (reason "high-risk"))
+f-97    (security-verdict (target db1) (action isolate) (level high) (reason "critical-asset"))
+```
+
+### 6) Служебные этапы процесса
+
+Категория: `промежуточные факты` + признак финализации.
+
+Общий комментарий: эти факты подтверждают, что конвейер вывода дошел до завершения всех этапов.
+
+- `context (key ... )` со значениями `ready/written/closed/done/complete/stable`:
+  маркеры прохождения стадий.
+- `(analysis-stage (n 47))`:
+  финальная техническая отметка номера этапа.
+
+Таблица примеров:
+
+| Факт | Что означает |
+|---|---|
+| `(context (key report) (value ready))` | Отчетный результат сформирован. |
+| `(context (key system-state) (value stable))` | Финальное состояние ЭС стабильное. |
+
+Факты группы (дословно из вывода CLIPS):
+
+```text
+f-22    (context (key raw-collected) (value yes))
+f-24    (context (key nodes-verified) (value yes))
+f-26    (context (key normalization) (value started))
+f-28    (context (key protocols-seen) (value yes))
+f-74    (context (key decision-http) (value ready))
+f-77    (decision-flag (service http))
+f-79    (context (key decision-ssh) (value ready))
+f-82    (decision-flag (service ssh))
+f-84    (context (key decision-dns) (value ready))
+f-87    (decision-flag (service dns))
+f-89    (context (key verdicts) (value consolidated))
+f-91    (context (key posture) (value high))
+f-99    (context (key log) (value written))
+f-101   (context (key session) (value closed))
+f-103   (context (key cleanup) (value done))
+f-105   (context (key summary) (value ready))
+f-107   (context (key report) (value ready))
+f-109   (context (key inference) (value complete))
+f-111   (context (key system-state) (value stable))
+f-112   (analysis-stage (n 47))
+```
+
+## Интерпретация итоговых результатов ЭС на натуральном языке
+
+##### общий риск
+`(context (key risk) (value high))`
+Система оценила суммарный риск по текущей ситуации как высокий.
+
+##### блокировка HTTP
+`(security-verdict (target http) (action block) (level high) (reason "ddos"))`
+Принято решение блокировать HTTP-трафик из-за признаков DDoS-атаки высокой критичности.
+
+##### блокировка SSH
+`(security-verdict (target ssh) (action block) (level high) (reason "bruteforce"))`
+Принято решение блокировать SSH-доступ из-за подтвержденной brute-force активности высокого уровня риска.
+
+##### блокировка DNS
+`(security-verdict (target dns) (action block) (level high) (reason "dns-tunnel"))`
+Принято решение блокировать DNS-трафик по причине обнаруженного DNS-туннелирования высокой опасности.
+
+##### мониторинг сети
+`(security-verdict (target network) (action monitor) (level medium) (reason "continuous-monitoring"))`
+Назначен усиленный непрерывный мониторинг сети для контроля дальнейшего развития инцидента.
+
+##### эскалация в SOC
+`(security-verdict (target soc) (action escalate) (level high) (reason "high-risk"))`
+Инцидент необходимо передать в SOC для оперативного реагирования из-за высокого общего риска.
+
+##### изоляция db1
+`(security-verdict (target db1) (action isolate) (level high) (reason "critical-asset"))`
+Критичный узел `db1` должен быть изолирован, чтобы снизить вероятность компрометации важного актива.
+
+##### финальное состояние
+`(context (key system-state) (value stable))`
+Экспертная система завершила вывод и зафиксировала стабильное итоговое состояние.

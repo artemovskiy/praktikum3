@@ -42,3 +42,14 @@
 •	Комментарии к ключевым участкам
 •	Документация по использованию
 •	Ссылка на проект или Архив проекта
+
+## Полезные материалы
+
+сама база знаний в файле `network_security_assessment.clp`
+
+- Инструкция по установке и проверке CLIPS на macOS:
+  [notes/clips_install_macos.md](/Users/mvkutepov/work/praktikum3/notes/clips_install_macos.md)
+- Анализ базы знаний экспертной системы:
+  [notes/es_clp_analysis.md](notes/es_clp_analysis.md)
+- Пример запуска МЛВ и разбор результатов:
+  [notes/mlv_run_example.md](notes/mlv_run_example.md)
