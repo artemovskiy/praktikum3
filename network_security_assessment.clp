@@ -609,3 +609,57 @@
   (assert (context (key system-state) (value stable)))
   (assert (analysis-stage (n 47)))
 )
+
+;===================================
+; ПРАВИЛА ДЛЯ ВЫВОДА РЕЗУЛЬТАТОВ
+;===================================
+
+; 51. Вывод итоговых вердиктов по сервисам
+(defrule r51-print-verdicts
+  (declare (salience -10))  ; Низкий приоритет - сработает в конце
+  (security-verdict (target ?t) (action ?a) (level ?l) (reason ?r))
+  =>
+  (printout t "==========================================" crlf)
+  (printout t "ВЕРДИКТ ДЛЯ " ?t ":" crlf)
+  (printout t "  Действие: " ?a crlf)
+  (printout t "  Уровень: " ?l crlf)
+  (printout t "  Причина: " ?r crlf)
+)
+
+; 52. Вывод всех обнаруженных угроз
+(defrule r52-print-threats
+  (declare (salience -15))
+  (threat-indicator (type ?type) (src ?src) (dst ?dst) (severity ?sev) (evidence ?ev))
+  =>
+  (printout t "------------------------------------------" crlf)
+  (printout t "⚠ УГРОЗА: " ?type crlf)
+  (printout t "  Источник: " ?src crlf)
+  (printout t "  Цель: " ?dst crlf)
+  (printout t "  Серьезность: " ?sev crlf)
+  (printout t "  Признак: " ?ev crlf)
+)
+
+; 53. Вывод итогового статуса системы
+(defrule r53-print-summary
+  (declare (salience -20))
+  ?stage <- (analysis-stage (n ?n))
+  (context (key posture) (value ?posture))
+  =>
+  (printout t "==========================================" crlf)
+  (printout t "ИТОГОВЫЙ ОТЧЕТ ПО БЕЗОПАСНОСТИ" crlf)
+  (printout t "==========================================" crlf)
+  (printout t "Статус системы: " ?posture crlf)
+  (printout t "Анализ завершен на этапе: " ?n crlf)
+  (printout t "==========================================" crlf)
+)
+
+; 54. Вывод рекомендаций для администратора
+(defrule r54-print-recommendations
+  (declare (salience -25))
+  (candidate-action (service ?s) (action ?a) (reason ?r))
+  =>
+  (printout t "📋 РЕКОМЕНДАЦИЯ: " crlf)
+  (printout t "  Сервис: " ?s crlf)
+  (printout t "  Действие: " ?a crlf)
+  (printout t "  Причина: " ?r crlf)
+)
